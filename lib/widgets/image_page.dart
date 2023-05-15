@@ -28,11 +28,23 @@ class _ImagePageState extends State<ImagePage> {
       future: imgUrl,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return Image.network(snapshot.data as String);
+          return Image.network(
+            snapshot.data as String,
+            fit: BoxFit.fitHeight,
+          );
         } else if (snapshot.hasError) {
           return Text(snapshot.error.toString());
         } else {
-          return const CircularProgressIndicator();
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(),
+              ),
+            ],
+          );
         }
       },
     );

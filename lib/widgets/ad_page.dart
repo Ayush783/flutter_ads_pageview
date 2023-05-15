@@ -1,54 +1,15 @@
+import 'package:app/provider/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:provider/provider.dart';
 
-class AdPage extends StatefulWidget {
+class AdPage extends StatelessWidget {
   const AdPage({super.key});
 
   @override
-  State<AdPage> createState() => _AdPageState();
-}
-
-class _AdPageState extends State<AdPage> {
-  BannerAd? _bannerAd;
-  bool _isLoaded = false;
-
-  // TODO: replace this test ad unit with your own ad unit.
-  final adUnitId = 'ca-app-pub-3940256099942544/6300978111';
-
-  void loadAd() {
-    _bannerAd = BannerAd(
-      adUnitId: adUnitId,
-      request: const AdRequest(),
-      size: AdSize.banner,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          debugPrint('$ad loaded.');
-          setState(() {
-            _isLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, err) {
-          debugPrint('BannerAd failed to load: $err');
-          ad.dispose();
-        },
-      ),
-    )..load();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    loadAd();
-  }
-
-  @override
-  void dispose() {
-    _bannerAd?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final bannerAd = context.watch<AppProvider>().bannerAd;
+    final loadingAd = context.watch<AppProvider>().loadingAd;
     return Container(
       color: Colors.grey.shade200,
       child: Column(
@@ -57,12 +18,15 @@ class _AdPageState extends State<AdPage> {
           const Text(
             'ADVERTISEMENT',
           ),
-          if (_bannerAd != null)
-            SizedBox(
-              width: _bannerAd!.size.width.toDouble(),
-              height: _bannerAd!.size.height.toDouble(),
-              child: AdWidget(ad: _bannerAd!),
-            ),
+          SizedBox(
+            width: 380,
+            height: 420,
+            child: bannerAd != null && !loadingAd
+                ? AdWidget(
+                    ad: context.read<AppProvider>().bannerAd!,
+                  )
+                : const SizedBox(),
+          )
         ],
       ),
     );
